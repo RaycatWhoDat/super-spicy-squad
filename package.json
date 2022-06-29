@@ -1,0 +1,27 @@
+{
+  "name": "super-spicy-squad",
+  "version": "1.0.0",
+  "description": "For KaJam 2022.",
+  "main": "index.js",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --outfile=public/dist/game.js",
+    "dev": "esbuild src/main.js --bundle --outfile=public/dist/game.js --watch",
+    "serve": "serve public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RayMPerry/super-spicy-squad.git"
+  },
+  "keywords": [],
+  "author": "RaycatWhoDat",
+  "license": "",
+  "bugs": {
+    "url": "https://github.com/RayMPerry/super-spicy-squad/issues"
+  },
+  "homepage": "https://github.com/RayMPerry/super-spicy-squad#readme",
+  "dependencies": {
+    "esbuild": "^0.14.47",
+    "kaboom": "^2000.2.9",
+    "serve": "^13.0.2"
+  }
+}
