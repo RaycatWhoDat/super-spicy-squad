@@ -34,7 +34,6 @@ const getTilemapsFromCanvas = async imagePath => {
       
       const imageData = canvasContext.getImageData(0, 0, rawImageCanvas.width, rawImageCanvas.height);
       tilemaps = convertRgbToTilemaps(imageData);
-      console.log(tilemaps);
       resolve();
     };
 

@@ -12,6 +12,7 @@
 import kaboom from "kaboom";
 import { getPuzzleDataFromPath } from "./utils/puzzle-mapper";
 import { registerCustomComponents } from "./utils/custom-components";
+import { registerTransitions } from "./utils/transitions";
 import { registerScenes } from "./scenes";
 
 const gameOptions = {
@@ -25,46 +26,58 @@ const gameOptions = {
 kaboom(gameOptions);
 
 const constants = {
-  NUMBER_OFFSET: 20,
-  X_OFFSET: 475,
-  Y_OFFSET: 120,
-  IMAGE_WIDTH: 16,
-  IMAGE_HEIGHT: 16,
-  IMAGE_SCALE: 20,
-  OUTLINE_WIDTH: 2,
+  PUZZLES: {},
+  COLORS: {},
   SLATE: rgb(32, 32, 32),
   GRAY: rgb(96, 96, 96),
   CRIMSON: rgb(110, 0, 0),
   ORANGE: rgb(192, 128, 0),
+  GREEN: rgb(119, 170, 116)
 };
 
 Object.keys(constants).forEach(constantName => window[constantName] = constants[constantName]);
 
-// window.PUZZLES = {};
+const PEPPERS = [
+  "cayenne",
+  "jalapeno",
+  "habanero", 
+  "serrano",
+  "chilaca",
+  "ghost",
+];
 
-// load(new Promise(resolve => {
-//   const puzzleNames = ["serrano", "habanero"];
-  
-//   Promise.all(puzzleNames.map(async puzzleName => {
-//     loadSprite(puzzleName, `assets/sprites/${puzzleName}.png`);
-//     loadSprite(`${puzzleName}-color`, `assets/sprites/${puzzleName}-color.png`);
-//     return await getPuzzleDataFromPath(`assets/sprites/${puzzleName}.png`);
-//   })).then(puzzles => {
-//     resolve("ok");
-//     (puzzles || []).forEach((puzzleData, index) => {
-//       PUZZLES[puzzleNames[index]] = puzzleData;
-//     });
-loadSprite("ghost", "assets/images/ghost.png");
-loadSprite("jalapeno", "assets/images/jalapeno.png");
-  
+const PEPPER_COLORS = [
+  RED,
+  GREEN,
+  ORANGE,
+  YELLOW,
+  SLATE,
+  CRIMSON
+];
+
+load(new Promise(resolve => {
+  Promise.all(PEPPERS.map(async pepperName => {
+    loadSprite(pepperName, `assets/sprites/${pepperName}.png`);
+    loadSprite(`${pepperName}-color`, `assets/sprites/${pepperName}-color.png`);
+    loadSprite(`${pepperName}-image`, `assets/sprites/${pepperName}-image.png`);
+    loadSound(`${pepperName}-speak`, `assets/sounds/${pepperName}-speak.ogg`);
+    return await getPuzzleDataFromPath(`assets/sprites/${pepperName}.png`);
+  })).then(puzzles => {
+    resolve("ok");
+    (puzzles || []).forEach((puzzleData, index) => {
+      PUZZLES[PEPPERS[index]] = puzzleData;
+      COLORS[PEPPERS[index]] = PEPPER_COLORS[index];
+    });
 
     registerCustomComponents();
+    registerTransitions();
     registerScenes();
 
-//     loadSound("hit", "assets/sounds/hit.ogg");
-//     // go("prologue");
-//     // go("puzzle", { DEV_MODE: true, puzzleName: "habanero", backgroundColor: ORANGE });
-//   });
-// }));
+    loadSound("hit", "assets/sounds/jab.ogg");
+    loadSound("miss", "assets/sounds/damage.ogg");
+    go("prologue");
+    // go("dialogue");
+    // go("puzzle", { DEV_MODE: true, pepperName: "habanero" });
+  });
+}));
  
-go("dialogue");

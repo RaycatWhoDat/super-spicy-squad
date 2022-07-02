@@ -1,23 +1,65 @@
+const NUMBER_OFFSET = 20;
+const X_OFFSET = 475;
+const Y_OFFSET = 120;
+const IMAGE_WIDTH = 16;
+const IMAGE_HEIGHT = 16;
+const IMAGE_SCALE = 20;
+const OUTLINE_WIDTH = 2;
+
 const TAGS = {
   ROW_CONSTRAINT: "rowConstraint",
   COLUMN_CONSTRAINT: "columnConstraint",
   GRID_SQUARE: "gridSquare",
   IS_REQUIRED: "isRequired",
   ZERO_COLUMN: "zeroColumn",
-  BACKGROUND: "background"
+  BACKGROUND: "background",
+  PEPPER: "pepper"
 };
 
 export const puzzleScene = () => scene('puzzle', options => {
   add([
     pos(0, 0),
     rect(width(), height()),
-    color(options.backgroundColor || CRIMSON),
+    color(COLORS[options.pepperName] || BLACK),
+    area(),
+    z(10),
+    lifespan(1, { fade: 1 })
+  ]);
+  
+  add([
+    pos(0, 0),
+    rect(width(), height()),
+    color(COLORS[options.pepperName] || BLACK),
     z(-1),
     area(),
     TAGS.BACKGROUND
   ]);
+
+  const ORIGINAL_POSITION = vec2(215, 245);
+  const PEPPER_OFFSET = 10;
+  let chancesRemaining = 4;
   
-  const { rows, columns, data } = PUZZLES[options.puzzleName] || {};
+  const pepper = add([
+    pos(ORIGINAL_POSITION),
+    sprite(`${options.pepperName}-image`),
+    color(WHITE),
+    origin("center"),
+    TAGS.PEPPER
+  ]);
+
+  const chancesRemainingText = add([
+    text(chancesRemaining),
+    pos(ORIGINAL_POSITION),
+    scale(7),
+    color(WHITE),
+    opacity(0.8)
+  ]);
+
+  onUpdate(TAGS.PEPPER, pepper => {
+    pepper.pos.y = wave(ORIGINAL_POSITION.y - PEPPER_OFFSET, ORIGINAL_POSITION.y + PEPPER_OFFSET, time() * 3);
+  });
+
+  const { rows, columns, data } = PUZZLES[options.pepperName] || {};
   let currentSquare = null;
 
   rows.forEach((row, rowIndex) => {
@@ -77,7 +119,9 @@ export const puzzleScene = () => scene('puzzle', options => {
         }
         
         numberOfRequiredSquares--;
-        if (numberOfRequiredSquares === 0) win({ cancelSquareHover, cancelLeftClick, cancelRightClick });
+        if (numberOfRequiredSquares === 0) {
+          win({ cancelSquareHover, cancelLeftClick, cancelRightClick });
+        }
       });
 
       gridSquare.onStateEnter("marked", () => {
@@ -90,13 +134,15 @@ export const puzzleScene = () => scene('puzzle', options => {
     }
   }
 
+  const allGridSquares = get(TAGS.GRID_SQUARE);
+
   const cancelSquareHover = onHover(TAGS.GRID_SQUARE, square => {
     if (currentSquare?.gridId === square.gridId) return;
     currentSquare = square;
   });
 
   const cancelLeftClick = onMousePress("left", position => {
-    if (!currentSquare || currentSquare.state === "marked") return;
+    if (!currentSquare || currentSquare?.state !== "none") return;
 
     if (!currentSquare.hasPoint(position)) {
       currentSquare = null;
@@ -104,7 +150,16 @@ export const puzzleScene = () => scene('puzzle', options => {
     }
     
     if (data[currentSquare.yIndex][currentSquare.xIndex] === 0) {
+      play("miss", { volume: 0.6 });
+      chancesRemaining--;
+      chancesRemainingText.text = chancesRemaining;
+      pepper.color = pepper.color.darken(Math.ceil(255 / 4));
       shake(10);
+
+      if (chancesRemaining === 0) {
+        lose({ cancelSquareHover, cancelLeftClick, cancelRightClick });
+      }
+      
       return;
     }
     
@@ -122,7 +177,7 @@ export const puzzleScene = () => scene('puzzle', options => {
     if (cancelRightClick) cancelRightClick();
 
     add([
-      sprite(`${options.puzzleName}-color`),
+      sprite(`${options.pepperName}-color`),
       pos(X_OFFSET, Y_OFFSET),
       scale(20),
       z(2),
@@ -132,12 +187,66 @@ export const puzzleScene = () => scene('puzzle', options => {
         delay: 0.5
       })
     ]);
+
+    add([
+      pos(0, 0),
+      rect(width(), height()),
+      color(BLACK),
+      area(),
+      z(10),
+      opacity(0),
+      fadeIn({
+        duration: 2,
+        delay: 2.5
+      })
+    ]);
+
+    wait(5, () => go("dialogue", { scriptIndex: 0 }));
   }
 
+  const lose = ({ cancelSquareHover, cancelLeftClick, cancelRightClick }) => {
+    const outlineWidth = 4;
+
+    if (cancelSquareHover) cancelSquareHover();
+    if (cancelLeftClick) cancelLeftClick();
+    if (cancelRightClick) cancelRightClick();
+
+    add([
+      rect(width() + (outlineWidth * 2), Math.floor(height() / 3)),
+      color(CRIMSON),
+      outline(outlineWidth, BLACK),
+      pos(-outlineWidth, center().y - Math.floor(height() / 6)),
+      z(11),
+      "game-over"
+    ]);
+
+    add([
+      text("SPICE IS DEAD"),
+      color(WHITE),
+      pos(165, center().y - 50),
+      scale(5),
+      z(11),
+      "game-over"
+    ]);
+
+    add([
+      text("Left-click to restart"),
+      color(WHITE),
+      pos(90, center().y + 15),
+      scale(4),
+      z(11),
+      "game-over"
+    ]);
+
+    wait(0.25, () => {
+      onClick(() => {
+        go("puzzle", options);
+      });
+    });
+  };
+                                       
   // Dev mode keys
   if (options.DEV_MODE) {
-    const allGridSquares = get(TAGS.GRID_SQUARE);
-
     // Reset
     onKeyPress("r", () => {
       allGridSquares.forEach(square => square.enterState("none"));

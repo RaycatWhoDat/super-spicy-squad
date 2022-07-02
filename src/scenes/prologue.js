@@ -16,5 +16,5 @@ export const prologueScene = () => scene('prologue', () => {
     })
   ]));
 
-  onClick(() => go('title'));
+  onClick(() => wait(0.5, () => go('dialogue')));
 });
