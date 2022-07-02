@@ -1,8 +1,8 @@
-const circleTransition = (sceneName, options) => {
+const circleTransition = (sceneName, options = {}) => {
   add([
     pos(center()),
     circle(1),
-    color(COLORS[options.pepperName] || BLACK),
+    color(COLORS[options?.pepperName] || BLACK),
     embiggen(options.multiplier),
     z(10),
     "transition"

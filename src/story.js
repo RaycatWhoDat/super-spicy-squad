@@ -12,13 +12,21 @@ const episode5Script = [
   ["jalapeno", "left", "damn cuh", true]
 ];
 
-const episode15Script = [];
+const episode15Script = [
+  ["habanero", "left", "DAMN CUH!", true]
+];
 
-const episode37Script = [];
+const episode37Script = [
+  ["serrano", "left", "damn cuh...", true]
+];
 
-const episode38Script = [];
+const episode38Script = [
+  ["chilaca", "left", "Damn, cuh.", true]
+];
 
-const episode49Script = [];
+const episode49Script = [
+  [null, null, "DAMN, CUH!", true]
+];
 
 const allScripts = [
   episode1Script,

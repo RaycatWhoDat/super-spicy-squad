@@ -1,5 +1,5 @@
 export const episodeCardScene = () => scene('episode-card', (options = {}) => {
-  const episodeNumbers = [1, 5, 15, 37, 49];
+  const episodeNumbers = [1, 5, 15, 37, 38, 49];
   const episodeTitles = [
     "Amazing! A New Spicy Squad Is Born!",
     "Spiciness of Our Bonds",

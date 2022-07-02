@@ -1,4 +1,4 @@
-export const creditsScene = () => scene('credits', options => {
+export const creditsScene = () => scene('credits', (options = {}) => {
   add([
     text("Thanks for playing!"),
     origin("center"),

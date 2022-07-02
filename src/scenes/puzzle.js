@@ -16,7 +16,7 @@ const TAGS = {
   PEPPER: "pepper"
 };
 
-export const puzzleScene = () => scene('puzzle', options => {
+export const puzzleScene = () => scene('puzzle', (options = {}) => {
   add([
     pos(0, 0),
     rect(width(), height()),
@@ -232,7 +232,7 @@ export const puzzleScene = () => scene('puzzle', options => {
       })
     ]);
 
-    wait(5, () => go("episode-card", { scriptIndex: SCRIPT_INDEX + 1 }));
+    wait(5, () => go(SCRIPT_INDEX + 1 < SCRIPTS.length ? "episode-card" : "credits", { scriptIndex: SCRIPT_INDEX + 1 }));
   }
 
   const lose = ({ cancelSquareHover, cancelLeftClick, cancelRightClick }) => {

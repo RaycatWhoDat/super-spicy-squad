@@ -1,4 +1,4 @@
-export const titleScene = () => scene('title', () => {
+export const titleScene = () => scene('title', (options = {}) => {
   add([
     pos(0, 0),
     rect(width(), height()),

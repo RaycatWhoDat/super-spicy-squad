@@ -1,4 +1,4 @@
-export const prologueScene = () => scene('prologue', () => {
+export const prologueScene = () => scene('prologue', (options = {}) => {
   const prologueText = [
     "The world is under attack!",
     "Spicy things are losing their spiciness!",
