@@ -1,32 +1,35 @@
-export const dialogueScene = () => scene('dialogue', options => {
+export const dialogueScene = () => scene('dialogue', (options = {}) => {
   const POSITION = vec2(20, 360);
   const NAME_BOX_SIZE = 32;
   const OFFSET = 0;
   const DIALOGUE_X_OFFSET = 8;
   const DIALOGUE_Y_OFFSET = 9;
 
-  const script = [
-    ["jalapeno", "left", "It will be a cold day in Hell before I let you \nwalk away, Red Ghost. I'll chase you to the ends\nof the Earth!"],
-    ["jalapeno", "left", "SHOCKKKKKEEERRRRRRR!"],
-    ["ghost", "right", "...aight"]
-  ]
-  
-  const speaker1Image = add([
-    sprite("jalapeno-image"),
-    pos(POSITION.x - 180, POSITION.y - NAME_BOX_SIZE + OFFSET - 290)
+  const script = SCRIPTS[SCRIPT_INDEX] || [];
+
+  add([
+    pos(0, 0),
+    rect(width(), height()),
+    color(BLACK),
+    lifespan(0.5, { fade: 0.5 }),
+    z(10)
   ]);
+  
+  const speaker1Image = add([]);
 
   const speaker2Image = add([
-    sprite("ghost-image", { flipX: false }),
-    pos(width() - 150, POSITION.y - NAME_BOX_SIZE + OFFSET - 100),
+    sprite("ghost-image"),
+    pos(width() - 150, POSITION.y - NAME_BOX_SIZE + OFFSET - 90),
     origin("center"),
     rotate(45),
-    scale(1.6)
+    scale(1.5)
   ]);
 
+  speaker2Image.hidden = true;
+  
   const nameBox = add([
     pos(POSITION.x, POSITION.y - NAME_BOX_SIZE + OFFSET),
-    rect(240, NAME_BOX_SIZE),
+    rect(260, NAME_BOX_SIZE),
     color(SLATE),
     outline(4, GRAY),
     z(3),
@@ -43,7 +46,7 @@ export const dialogueScene = () => scene('dialogue', options => {
 
   const nameBoxLine = add([
     pos(POSITION.x + 2, POSITION.y - 4 + OFFSET),
-    rect(236, 8),
+    rect(256, 8),
     color(SLATE),
     z(3),
     "name"
@@ -57,6 +60,15 @@ export const dialogueScene = () => scene('dialogue', options => {
     "chilaca": "Chilaca Black",
     "ghost": "Red Ghost"
   };
+
+  const additionalComps = {
+    "cayenne": [pos(-140, 60)],
+    "habanero": [pos(-80, -20)],
+    "chilaca": [pos(220, 60), rotate(90)],
+    "jalapeno": [pos(-160, 20)],
+    "serrano": [pos(140, 20), rotate(75)],
+    "ghost": [rotate(45), scale(1.5)]
+  }
   
   const speakerName = add([
     text(""),
@@ -78,9 +90,14 @@ export const dialogueScene = () => scene('dialogue', options => {
     if (dialogue?.isDone === false) return;
     dialogue.text = "";
     speakerName.text = FULL_NAMES[pepperName] || "";
+    if (pepperName && side === "left") {
+      ["sprite", "rotate", "scale", "pos"].forEach(speaker1Image.unuse);
+      speaker1Image.use(sprite(`${pepperName}-image`));
+      (additionalComps[pepperName] || []).forEach(comp => speaker1Image.use(comp));
+    }    
     every("name", entity => {
       entity.hidden = pepperName == null;
-      entity.pos.x += side === "right" ? 800 - 240 : 0;
+      entity.pos.x += side === "right" ? 800 - 260 : 0;
     });
   };
 
@@ -88,7 +105,8 @@ export const dialogueScene = () => scene('dialogue', options => {
 
   const setNewDialogue = () => {
     dialogue.unuse("typeText");
-    const [pepperName, side, text] = script[dialogue.scriptIndex] || [];
+    const [pepperName, side, text, showGhost] = script[dialogue.scriptIndex] || [];
+    if (typeof showGhost === "boolean") speaker2Image.hidden = !showGhost;
     nextSpeaker({ pepperName, side });
     dialogue.use(typeText({ text, pepperName }));
   };
@@ -102,8 +120,13 @@ export const dialogueScene = () => scene('dialogue', options => {
       setNewDialogue();
       return;
     } else {
+      
       if (!get("transition").length) {
-        circleTransition("puzzle", { DEV_MODE: true, pepperName: "jalapeno" });
+        if (SCRIPT_INDEX < SCRIPTS.length) {
+          circleTransition("puzzle", { DEV_MODE: true, pepperName: PEPPERS[SCRIPT_INDEX] });
+        } else {
+          circleTransition("credits");
+        }
       }
     }
   });

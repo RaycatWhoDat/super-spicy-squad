@@ -53,11 +53,11 @@ const typeText = ({ text, speed = 0.05, pepperName }) => {
 };
 
 
-const embiggen = () => ({
+const embiggen = (multiplier = 1.5) => ({
     id: "embiggen",
     require: ["circle"],
     update() {
-      this.radius += width() * 1.5 * dt();
+      this.radius += width() * multiplier * dt();
     }
 });
 

@@ -1,11 +1,4 @@
 // TODO: Write the story
-// TODO: Create dialogue system
-// TODO: Automatic word wrapping
-// TODO: Letter-by-letter speaking
-// TODO: Create the rest of the puzzles
-// TODO: Generate JSON
-// TODO: Make the art assets for the VN
-// TODO: Title screen, Transition screen, VN screen
 
 "use strict";
 
@@ -14,6 +7,7 @@ import { getPuzzleDataFromPath } from "./utils/puzzle-mapper";
 import { registerCustomComponents } from "./utils/custom-components";
 import { registerTransitions } from "./utils/transitions";
 import { registerScenes } from "./scenes";
+import { registerScripts } from "./story";
 
 const gameOptions = {
   width: 840,
@@ -25,18 +19,6 @@ const gameOptions = {
 
 kaboom(gameOptions);
 
-const constants = {
-  PUZZLES: {},
-  COLORS: {},
-  SLATE: rgb(32, 32, 32),
-  GRAY: rgb(96, 96, 96),
-  CRIMSON: rgb(110, 0, 0),
-  ORANGE: rgb(192, 128, 0),
-  GREEN: rgb(119, 170, 116)
-};
-
-Object.keys(constants).forEach(constantName => window[constantName] = constants[constantName]);
-
 const PEPPERS = [
   "cayenne",
   "jalapeno",
@@ -45,6 +27,23 @@ const PEPPERS = [
   "chilaca",
   "ghost",
 ];
+
+const constants = {
+  PEPPERS,
+  PUZZLES: {},
+  COLORS: {},
+  SCRIPT_INDEX: 0,
+  SLATE: rgb(32, 32, 32),
+  GRAY: rgb(96, 96, 96),
+  CRIMSON: rgb(110, 0, 0),
+  ORANGE: rgb(192, 128, 0),
+  GREEN: rgb(119, 170, 116),
+  YELLOW: rgb(241, 218, 85),
+  RED: rgb(164, 3, 31)
+};
+
+Object.keys(constants).forEach(constantName => window[constantName] = constants[constantName]);
+
 
 const PEPPER_COLORS = [
   RED,
@@ -72,12 +71,12 @@ load(new Promise(resolve => {
     registerCustomComponents();
     registerTransitions();
     registerScenes();
+    registerScripts();
 
     loadSound("hit", "assets/sounds/jab.ogg");
     loadSound("miss", "assets/sounds/damage.ogg");
+
     go("prologue");
-    // go("dialogue");
-    // go("puzzle", { DEV_MODE: true, pepperName: "habanero" });
   });
 }));
  

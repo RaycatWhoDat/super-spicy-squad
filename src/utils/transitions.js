@@ -3,7 +3,7 @@ const circleTransition = (sceneName, options) => {
     pos(center()),
     circle(1),
     color(COLORS[options.pepperName] || BLACK),
-    embiggen(),
+    embiggen(options.multiplier),
     z(10),
     "transition"
   ]);

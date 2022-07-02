@@ -37,7 +37,17 @@ export const puzzleScene = () => scene('puzzle', options => {
 
   const ORIGINAL_POSITION = vec2(215, 245);
   const PEPPER_OFFSET = 10;
-  let chancesRemaining = 4;
+
+  const maxChancesRemaining = {
+    "cayenne": 4,
+    "habanero": 5,
+    "chilaca": 1,
+    "jalapeno": 2,
+    "serrano": 3,
+    "ghost": 9
+  }
+  
+  let chancesRemaining = maxChancesRemaining[options.pepperName] || 0;
   
   const pepper = add([
     pos(ORIGINAL_POSITION),
@@ -47,12 +57,33 @@ export const puzzleScene = () => scene('puzzle', options => {
     TAGS.PEPPER
   ]);
 
+  if (options.pepperName === "habanero") {
+    pepper.pos.x += 30;
+  }
+
+  if (options.pepperName === "serrano") {
+    pepper.pos.x += 10;
+    pepper.pos.y -= 10;
+    pepper.use(rotate(75));
+  }
+
+  if (options.pepperName === "chilaca") {
+    pepper.pos.x += 30;
+    pepper.pos.y -= 10;
+    pepper.use(rotate(90));
+  }
+
+  if (options.pepperName === "ghost") {
+    pepper.unuse("sprite");
+    pepper.pos.x += 30;
+    pepper.use(sprite("habanero-image"));
+  }
+
   const chancesRemainingText = add([
     text(chancesRemaining),
     pos(ORIGINAL_POSITION),
     scale(7),
-    color(WHITE),
-    opacity(0.8)
+    color(WHITE)
   ]);
 
   onUpdate(TAGS.PEPPER, pepper => {
@@ -114,7 +145,7 @@ export const puzzleScene = () => scene('puzzle', options => {
             lifespan(0.25, { fade: 0.25 })
           ]);
           
-          play("hit", { volume: 0.6 });
+          play("hit", { volume: 0.5 });
           shake(1);
         }
         
@@ -150,10 +181,10 @@ export const puzzleScene = () => scene('puzzle', options => {
     }
     
     if (data[currentSquare.yIndex][currentSquare.xIndex] === 0) {
-      play("miss", { volume: 0.6 });
+      play("miss", { volume: 0.5 });
       chancesRemaining--;
       chancesRemainingText.text = chancesRemaining;
-      pepper.color = pepper.color.darken(Math.ceil(255 / 4));
+      pepper.color = pepper.color.darken(Math.ceil(255 / maxChancesRemaining[options.pepperName]));
       shake(10);
 
       if (chancesRemaining === 0) {
@@ -201,7 +232,7 @@ export const puzzleScene = () => scene('puzzle', options => {
       })
     ]);
 
-    wait(5, () => go("dialogue", { scriptIndex: 0 }));
+    wait(5, () => go("episode-card", { scriptIndex: SCRIPT_INDEX + 1 }));
   }
 
   const lose = ({ cancelSquareHover, cancelLeftClick, cancelRightClick }) => {
@@ -247,19 +278,6 @@ export const puzzleScene = () => scene('puzzle', options => {
                                        
   // Dev mode keys
   if (options.DEV_MODE) {
-    // Reset
-    onKeyPress("r", () => {
-      allGridSquares.forEach(square => square.enterState("none"));
-    });
-    
-    // All empty squares
-    onKeyPress("1", () => {
-      allGridSquares.forEach(square => {
-        if (data[square.yIndex][square.xIndex] === 1) return;
-        square.enterState("marked");
-      });
-    });
-    
     // All required squares
     onKeyPress("2", () => {
       allGridSquares.forEach(square => {
