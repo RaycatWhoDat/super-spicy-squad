@@ -97,7 +97,14 @@ export const dialogueScene = () => scene('dialogue', (options = {}) => {
     }    
     every("name", entity => {
       entity.hidden = pepperName == null;
-      entity.pos.x += side === "right" ? 800 - 260 : 0;
+      if (side === "right" && entity.pos.x < center().x) {
+        entity.pos.x += 540;
+      }
+
+      if (side === "left" && entity.pos.x > center().x) {
+        entity.pos.x -= 540;
+      }
+      
     });
   };
 

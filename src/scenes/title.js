@@ -1,4 +1,6 @@
 export const titleScene = () => scene('title', (options = {}) => {
+  SCRIPT_INDEX = 0;
+  
   add([
     pos(0, 0),
     rect(width(), height()),

@@ -75,8 +75,7 @@ export const puzzleScene = () => scene('puzzle', (options = {}) => {
 
   if (options.pepperName === "ghost") {
     pepper.unuse("sprite");
-    pepper.pos.x += 30;
-    pepper.use(sprite("habanero-image"));
+    pepper.use(sprite("cayenne-image"));
   }
 
   const chancesRemainingText = add([
@@ -151,7 +150,7 @@ export const puzzleScene = () => scene('puzzle', (options = {}) => {
         
         numberOfRequiredSquares--;
         if (numberOfRequiredSquares === 0) {
-          win({ cancelSquareHover, cancelLeftClick, cancelRightClick });
+          win({ cancelSquareHover, cancelLeftClick, cancelRightClick, isForfeit: DEV_MODE });
         }
       });
 
@@ -202,12 +201,13 @@ export const puzzleScene = () => scene('puzzle', (options = {}) => {
     currentSquare.enterState(currentSquare.state === "none" ? "marked" : "none");
   });
   
-  const win = ({ cancelSquareHover, cancelLeftClick, cancelRightClick }) => {
+  const win = ({ cancelSquareHover, cancelLeftClick, cancelRightClick, isForfeit }) => {
     if (cancelSquareHover) cancelSquareHover();
     if (cancelLeftClick) cancelLeftClick();
     if (cancelRightClick) cancelRightClick();
 
-    add([
+    
+    const colorImage = add([
       sprite(`${options.pepperName}-color`),
       pos(X_OFFSET, Y_OFFSET),
       scale(20),
@@ -218,6 +218,8 @@ export const puzzleScene = () => scene('puzzle', (options = {}) => {
         delay: 0.5
       })
     ]);
+
+    // if (isForfeit) colorImage.hidden = true;
 
     add([
       pos(0, 0),
@@ -278,6 +280,14 @@ export const puzzleScene = () => scene('puzzle', (options = {}) => {
                                        
   // Dev mode keys
   if (options.DEV_MODE) {
+    // All empty squares
+    onKeyPress("1", () => {
+      allGridSquares.forEach(square => {
+        if (data[square.yIndex][square.xIndex] === 1) return;
+        square.enterState("marked");
+      });
+    });
+    
     // All required squares
     onKeyPress("2", () => {
       allGridSquares.forEach(square => {
