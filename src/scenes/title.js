@@ -55,7 +55,7 @@ export const titleScene = () => scene('title', (options = {}) => {
   const ghostPepper = add([
     pos(700, 50),
     sprite(`ghost-image`),
-    color(BLACK),
+    color(options?.completed ? WHITE : BLACK),
     rotate(45),
     scale(1.5)
   ]);

@@ -26,5 +26,5 @@ export const creditsScene = () => scene('credits', (options = {}) => {
     fadeIn({ duration: 1, delay: 2 })
   ]);
 
-  wait(2, () => onClick(() => go("title")));
+  wait(2, () => onClick(() => go("title", { completed: true })));
 });

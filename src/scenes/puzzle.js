@@ -206,7 +206,6 @@ export const puzzleScene = () => scene('puzzle', (options = {}) => {
     if (cancelLeftClick) cancelLeftClick();
     if (cancelRightClick) cancelRightClick();
 
-    
     const colorImage = add([
       sprite(`${options.pepperName}-color`),
       pos(X_OFFSET, Y_OFFSET),

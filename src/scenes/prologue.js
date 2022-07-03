@@ -1,7 +1,7 @@
 export const prologueScene = () => scene('prologue', (options = {}) => {
   const prologueText = [
-    "The world is under attack!",
-    "Spicy things are losing their spiciness!",
+    "Our world is under attack!",
+    "Peppers are becoming BLAND!",
     "But five peppers were immune to this phenomenon!",
     "Five peppers that would become..."
   ];
